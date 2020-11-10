@@ -1,27 +1,99 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PetShop.Domain.Application.Handlers.ClientHandlers;
-using PetShop.Domain.Application;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
+using PetShop.Domain.Application.Clients.Commands;
+using PetShop.Domain.Application.Clients.Queries;
+using PetShop.Domain.Application;
+using Swashbuckle.AspNetCore.Annotations;
+using PetShop.Domain.Application.Clients.Dto;
 
 namespace PetShop.Api.Pet.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
+    [ApiController]
     public class ClientController : ControllerBase
     {
-        private readonly IAsyncRequestHandler<AddClientRequest, AddClientResponse> _addClientHandler;
+        private readonly IMediator _mediator;
 
-        public ClientController(IAsyncRequestHandler<AddClientRequest, AddClientResponse> addClientHandler)
+        public ClientController(IMediator mediator)
         {
-            _addClientHandler = addClientHandler;
+            _mediator = mediator;
+        }
+
+        [HttpPut]
+        [SwaggerOperation(Summary = "Update a client")]
+        [SwaggerResponse(201, Description = "The client was successfully created.", Type = typeof(Response<ClientDto>))]
+        public async Task<ActionResult<Response<UpdateClientResponse>>> UpdateClient([FromBody] UpdateClientCommand request)
+        {
+            var response = await _mediator.Send(request);
+
+            if (response.Error)
+            {
+                return BadRequest(response.Message);
+            }
+            else
+            {
+                return Created(nameof(GetClient), response);
+
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddClient(AddClientRequest addClientRequest)
+        [SwaggerOperation(Summary = "Create a client")]
+        [SwaggerResponse(201, Description = "The client was successfully created.", Type = typeof(Response<ClientDto>))]
+        public async Task<ActionResult<Response<CreateClientResponse>>> CreateClient([FromBody] CreateClientCommand request)
         {
-            return  Ok(await _addClientHandler.HandleAsync(addClientRequest));
+            var response = await _mediator.Send(request);
+
+            if(response.Error)
+            {
+                return BadRequest(response.Message);
+            }
+            else
+            {
+                return Created(nameof(GetClient), response);
+
+            }
+        }
+
+        [HttpPost]
+        [Route("{clientId}/pet")]
+        [SwaggerOperation(Summary = "Add a pet to a client")]
+        [SwaggerResponse(201, Description = "The pet was successfully added.", Type = typeof(Response<PetDto>))]
+        public async Task<ActionResult<Response<AddPetResponse>>> AddPet(Guid clientId, [FromBody] AddPetCommand request)
+        {
+            request.ClientId = clientId;
+            var response = await _mediator.Send(request);
+
+            if (response.Error)
+            {
+                return BadRequest(response.Message);
+            }
+            else
+            {
+                return Created(nameof(GetClient), response);
+
+            }
+        }
+
+        [HttpGet]
+        [Route("{clientId}")]
+        [SwaggerOperation(Summary = "Get a client")]
+        [SwaggerResponse(200, Description = "The client.", Type = typeof(Response<ClientDto>))]
+        public async Task<ActionResult<Response<ClientDto>>> GetClient(Guid clientId)
+        {
+            var response = await _mediator.Send(new GetClientByIdQuery { Id = clientId });
+
+            if (response.Error)
+            {
+                return BadRequest(response.Message);
+            }
+            else
+            {
+                return Ok(response);
+
+            }
         }
     }
 }

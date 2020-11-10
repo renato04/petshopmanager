@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PetShop.Domain", "PetShop.Domain", "{68A94945-6B18-487C-92BE-F4CD8D5E93A9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{68A94945-6B18-487C-92BE-F4CD8D5E93A9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PetShop.Infrastructure", "PetShop.Infrastructure", "{9CBC2E4D-A992-4758-9775-26989C9BA6B2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{9CBC2E4D-A992-4758-9775-26989C9BA6B2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PetShop.Api", "PetShop.Api", "{F95E5CDA-8190-4FA6-B0AC-61B5E799680A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{F95E5CDA-8190-4FA6-B0AC-61B5E799680A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetShop.Domain.Models", "PetShop.Domain.Models\PetShop.Domain.Models.csproj", "{05A296FC-DB02-4A1D-AE1A-C2AD066A639A}"
 EndProject

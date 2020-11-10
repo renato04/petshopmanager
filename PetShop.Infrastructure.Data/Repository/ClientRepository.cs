@@ -25,6 +25,12 @@ namespace PetShop.Infrastructure.Data.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task Update(Client client)
+        {
+            _context.Update(client);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Client>> GetAll()
         {
             return await _context.Clients.OrderBy(p => p.Name).ToListAsync();
@@ -32,7 +38,9 @@ namespace PetShop.Infrastructure.Data.Repository
 
         public async Task<Client> GetById(Guid id)
         {
-            return await _context.Clients.FindAsync(id);
+            return await _context.Clients.Include(p => p.Pets).FirstOrDefaultAsync(p => p.Id == id);
         }
+
+
     }
 }

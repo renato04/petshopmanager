@@ -1,8 +1,6 @@
-﻿using PetShop.Domain.Application.Handlers.ClientHandlers;
+﻿using PetShop.Domain.Application.Clients.Commands;
+using PetShop.Domain.Application.Clients.Dto;
 using PetShop.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PetShop.Domain.Application.Mapping
 {
@@ -10,11 +8,28 @@ namespace PetShop.Domain.Application.Mapping
     {
         public PetShopMappingProfile()
         {
-            CreateMap<AddClientRequest, Client>()
+            CreateMap<CreateClientCommand, Client>()
                 .ReverseMap();
 
-            CreateMap<AddClientResponse, Client>()
+            CreateMap<CreateClientResponse, Client>()
                 .ReverseMap();
+
+            CreateMap<UpdateClientCommand, Client>()
+                .ReverseMap();
+
+            CreateMap<UpdateClientResponse, Client>()
+                .ReverseMap();
+
+            CreateMap<ClientDto, Client>()
+                .ReverseMap();
+
+            CreateMap<PetDto, Pet>()
+                .ReverseMap();
+
+            CreateMap<AddPetCommand, Pet>();
+            CreateMap<Pet, AddPetResponse>();
+            CreateMap<UpdatePetCommand, Pet>();
+            CreateMap<Pet, UpdatePetResponse>();
 
         }
     }

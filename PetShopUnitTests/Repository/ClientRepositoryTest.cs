@@ -8,7 +8,6 @@ using PetShop.Infrastructure.Data.Context;
 using PetShop.Infrastructure.Data.Repository;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,11 +60,11 @@ namespace PetShopUnitTests.Repository
         {
             var id = new Guid("994aa42a-e292-42f1-b5d4-749cd19a4d29");
 
-            var expected = new Client { Name = "BBB", Id = id };
+            var expected = new Client { Name = "BBB", Id = id, Pets = new List<Pet> { new Pet { Name = "Link" } } };
 
             var clients = new List<Client>
             {
-                new Client { Name = "BBB", Id = id},
+                new Client { Name = "BBB", Id = id, Pets = new List<Pet>{ new Pet { Name = "Link" } } },
                 new Client { Name = "ZZZ", Id = Guid.NewGuid()},
                 new Client { Name = "AAA", Id = Guid.NewGuid()},
             };

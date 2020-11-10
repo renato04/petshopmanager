@@ -25,6 +25,12 @@ namespace PetShop.Infrastructure.Data.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task Update(Pet pet)
+        {
+            _context.Update(pet);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Pet>> GetAllByClient(Guid ClientId) =>
             await _context.Pets
                 .Where(p => p.Client.Id == ClientId)

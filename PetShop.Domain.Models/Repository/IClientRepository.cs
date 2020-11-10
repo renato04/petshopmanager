@@ -8,6 +8,7 @@ namespace PetShop.Domain.Models.Repository
     public interface IClientRepository
     {
         Task Add(Client client);
+        Task Update(Client client);
         Task<Client> GetById(Guid id);
         Task<IEnumerable<Client>> GetAll();
     }
