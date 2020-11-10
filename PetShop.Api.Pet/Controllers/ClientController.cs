@@ -7,6 +7,9 @@ using PetShop.Domain.Application.Clients.Queries;
 using PetShop.Domain.Application;
 using Swashbuckle.AspNetCore.Annotations;
 using PetShop.Domain.Application.Clients.Dto;
+using PetShop.Domain.Application.Clients.Commands.UpdateClient;
+using PetShop.Domain.Application.Clients.Commands.CreateClient;
+using PetShop.Domain.Application.Clients.Commands.AddPet;
 
 namespace PetShop.Api.Pet.Controllers
 {

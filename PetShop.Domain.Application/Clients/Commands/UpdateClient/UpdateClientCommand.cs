@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PetShop.Domain.Application.Clients.Commands
+namespace PetShop.Domain.Application.Clients.Commands.UpdateClient
 {
 
     public class UpdateClientCommand : IRequestWrapper<UpdateClientResponse>

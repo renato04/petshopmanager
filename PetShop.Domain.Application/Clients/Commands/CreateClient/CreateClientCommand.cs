@@ -11,7 +11,7 @@ using PetShop.Domain.Models;
 using System.ComponentModel.DataAnnotations;
 using PetShop.Domain.Application.Clients.Dto;
 
-namespace PetShop.Domain.Application.Clients.Commands
+namespace PetShop.Domain.Application.Clients.Commands.CreateClient
 {
     public class CreateClientCommand : IRequestWrapper<CreateClientResponse>
     {

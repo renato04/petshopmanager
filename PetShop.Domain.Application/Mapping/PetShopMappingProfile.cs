@@ -1,4 +1,7 @@
-﻿using PetShop.Domain.Application.Clients.Commands;
+﻿using PetShop.Domain.Application.Clients.Commands.AddPet;
+using PetShop.Domain.Application.Clients.Commands.CreateClient;
+using PetShop.Domain.Application.Clients.Commands.UpdateClient;
+using PetShop.Domain.Application.Clients.Commands.UpdatePet;
 using PetShop.Domain.Application.Clients.Dto;
 using PetShop.Domain.Models;
 

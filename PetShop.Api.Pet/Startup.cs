@@ -20,6 +20,7 @@ using Microsoft.OpenApi.Models;
 using PetShop.Domain.Application.Clients.Dto;
 using MediatR;
 using PetShop.Domain.Application.Clients.Commands;
+using PetShop.Domain.Application.Clients.Commands.AddPet;
 
 namespace PetShop.Api.Pet
 {

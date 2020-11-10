@@ -2,6 +2,7 @@
 using Moq;
 using NUnit.Framework;
 using PetShop.Domain.Application.Clients.Commands;
+using PetShop.Domain.Application.Clients.Commands.UpdatePet;
 using PetShop.Domain.Application.Clients.Dto;
 using PetShop.Domain.Application.Mapping;
 using PetShop.Domain.Models;
