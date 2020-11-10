@@ -22,7 +22,7 @@ namespace PetShopUnitTests.Application.Clients.Commands
         {
             string name = "Vader";
 
-            var request = new CreateClientCommand { Client = new ClientDto { Name = name } };
+            var request = new CreateClientCommand {  Name = name };
             var expected = new CreateClientResponse { Name = name };
 
             var mapper = PetShopMappingConfiguration.GetPetShopMappings();

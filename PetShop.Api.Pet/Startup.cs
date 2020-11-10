@@ -1,26 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using PetShop.Domain.Application;
 using PetShop.Domain.Application.Mapping;
 using PetShop.Infrastructure.Data.Context;
-using PetShop.Infrastructure.Data.Repository;
 using PetShop.Infrastructure.IoC;
 using Microsoft.OpenApi.Models;
-using PetShop.Domain.Application.Clients.Dto;
 using MediatR;
-using PetShop.Domain.Application.Clients.Commands;
 using PetShop.Domain.Application.Clients.Commands.AddPet;
+using PetShop.Domain.Application.Clients.Commands.CreateClient;
+using FluentValidation;
+using PetShop.Api.Pet.Behaviours;
+using PetShop.Domain.Application;
 
 namespace PetShop.Api.Pet
 {
@@ -55,6 +48,9 @@ namespace PetShop.Api.Pet
             });
 
             services.AddMediatR(typeof(AddPetCommandHandler).Assembly);
+            services.AddValidatorsFromAssembly(typeof(CreateClientCommandValidator).Assembly);
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
 
         }

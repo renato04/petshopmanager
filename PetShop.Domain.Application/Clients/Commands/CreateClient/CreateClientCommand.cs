@@ -15,9 +15,7 @@ namespace PetShop.Domain.Application.Clients.Commands.CreateClient
 {
     public class CreateClientCommand : IRequestWrapper<CreateClientResponse>
     {
-        [Required]
-        public ClientDto Client { get; set; }
-
+        public string Name { get; set; }
     }
 
     public class CreateClientResponse
@@ -40,7 +38,7 @@ namespace PetShop.Domain.Application.Clients.Commands.CreateClient
 
         public async Task<Response<CreateClientResponse>> Handle(CreateClientCommand request, CancellationToken cancellationToken)
         {
-            var client = _maper.Map<Client>(request.Client);
+            var client = _maper.Map<Client>(request);
 
             await _clientRepository.Add(client);
 
