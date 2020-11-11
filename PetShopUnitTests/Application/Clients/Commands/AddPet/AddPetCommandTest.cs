@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PetShopUnitTests.Application.Clients.Commands
+namespace PetShopUnitTests.Application.Clients.Commands.AddPet
 {
     public class AddPetCommandTest
     {
@@ -22,14 +22,19 @@ namespace PetShopUnitTests.Application.Clients.Commands
         {
             string name = "Vader";
 
-            var request = new AddPetCommand {  Name = name  };
-            var expected = new AddPetResponse { Name = name, Id = new Guid("994aa42a-e292-42f1-b5d4-749cd19a4d29")};
+            var clientId = Guid.NewGuid();
+
+            var request = new AddPetCommand {  Name = name , ClientId = clientId };
+            var expected = new AddPetResponse { Name = name, Id = new Guid("994aa42a-e292-42f1-b5d4-749cd19a4d29"), ClientId = clientId };
 
             var mapper = PetShopMappingConfiguration.GetPetShopMappings();
             var mockRepository = new Mock<IPetRepository>();
 
             mockRepository.Setup(p => p.Add(It.Is<Pet>(c => c.Name == name)))
-                .Returns((Pet pet) => Task.Run(() => { pet.Id = new Guid("994aa42a-e292-42f1-b5d4-749cd19a4d29"); }));
+                .Returns((Pet pet) => Task.Run(() => 
+                { 
+                    pet.Id = new Guid("994aa42a-e292-42f1-b5d4-749cd19a4d29"); 
+                }));
 
             var handler = new AddPetCommandHandler(mapper, mockRepository.Object);
 

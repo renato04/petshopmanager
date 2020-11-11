@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PetShopUnitTests.Application.Clients.Commands
+namespace PetShopUnitTests.Application.Clients.Commands.UpdatePet
 {
     public class UpdatePetCommandTest
     {

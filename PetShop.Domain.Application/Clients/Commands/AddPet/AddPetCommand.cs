@@ -20,6 +20,7 @@ namespace PetShop.Domain.Application.Clients.Commands.AddPet
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public Guid ClientId { get; set; }
     }
 
     public class AddPetCommandHandler : IHandlerWrapper<AddPetCommand, AddPetResponse>

@@ -71,13 +71,6 @@ namespace PetShopUnitTests.Repository
 
             var mock = clients.AsQueryable().BuildMockDbSet();
 
-            mock.Setup(p => p.FindAsync(It.IsAny<object[]>()))
-                .ReturnsAsync((object[] ids) =>
-                {
-                    var id = (Guid)ids.First();
-                    return clients.FirstOrDefault(x => x.Id == id);
-                });
-
             var mockContext = new Mock<PetShopDbContext>();
             mockContext.Setup(c => c.Clients).Returns(mock.Object);
 

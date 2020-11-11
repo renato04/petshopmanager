@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PetShop.Domain.Application.Clients.Commands.AddPet
+namespace PetShop.Domain.Application.Clients.Commands.UpdateClient
 {
-    public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
+    public class UpdateClientCommandValidator : AbstractValidator<UpdateClientCommand>
     {
-        public AddPetCommandValidator()
+        public UpdateClientCommandValidator()
         {
             RuleFor(c => c.Name).NotEmpty().WithMessage("Name must have a value");
         }
