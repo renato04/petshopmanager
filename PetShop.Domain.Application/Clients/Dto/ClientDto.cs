@@ -11,7 +11,7 @@ namespace PetShop.Domain.Application.Clients.Dto
         public Guid Id { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public List<PetDto> Pets { get; set; } = new List<PetDto>();
     }
@@ -21,7 +21,7 @@ namespace PetShop.Domain.Application.Clients.Dto
         public Guid Id { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [IgnoreDataMember]
         public Guid ClientId { get; set; }

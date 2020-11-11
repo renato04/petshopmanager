@@ -16,7 +16,7 @@ namespace PetShopUnitTests.Application.Clients.Commands.UpdatePet
         {
             var validator = new UpdatePetCommandValidator();
 
-            var model = new UpdatePetCommand { Name = string.Empty };
+            var model = new UpdatePetCommand(string.Empty, Guid.NewGuid());
 
             validator.Validate(model).IsValid.Should().BeFalse();
         }

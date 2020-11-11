@@ -7,25 +7,17 @@ namespace PetShop.Domain.Application
 
     public static class Response
     {
-        public static Response<T> Fail<T>(string message, T data = default, IEnumerable<string> errors = null) =>
+        public static Response<T> Fail<T>(string message, T data, IEnumerable<string>? errors = null) where T : notnull =>
             new Response<T>(data, message, true, errors);
 
-        public static Response<T> Ok<T>(T data, string message = "") =>
+        public static Response<T> Ok<T>(T data, string message = "") where T : notnull =>
             new Response<T>(data, message, false, null);
     }
 
-    public class Response<T>: IWithErrors
+    public record Response<T>: IWithErrors
+        where T : notnull
     {
-        public Response()
-        {
-            Data = default;
-            Message = string.Empty;
-            Error = false;
-            Errors = new List<string>();
-
-        }
-
-        public Response(T data, string msg, bool error, IEnumerable<string> errors)
+        public Response(T data, string msg, bool error, IEnumerable<string>? errors) 
         {
             Data = data;
             Message = msg;

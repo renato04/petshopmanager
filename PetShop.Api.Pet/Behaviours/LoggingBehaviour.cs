@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace PetShop.Api.Pet.Behaviours
 {
     public class LoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : notnull
     {
         private readonly ILogger<LoggingBehaviour<TRequest, TResponse>> _logger;
         public LoggingBehaviour(ILogger<LoggingBehaviour<TRequest, TResponse>> logger)
@@ -25,8 +26,8 @@ namespace PetShop.Api.Pet.Behaviours
             IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties());
             foreach (PropertyInfo prop in props)
             {
-                object propValue = prop.GetValue(request, null);
-                _logger.LogInformation("{Property} : {@Value}", prop.Name, propValue);
+                object? propValue = prop.GetValue(request, null);
+                _logger.LogInformation("{Property} : {@Value}", prop.Name, propValue ?? "null");
             }
             var response = await next();
             //Response

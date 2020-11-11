@@ -66,8 +66,8 @@ namespace PetShop.Api.Pet.Controllers
         [SwaggerResponse(201, Description = "The pet was successfully added.", Type = typeof(Response<PetDto>))]
         public async Task<ActionResult<Response<AddPetResponse>>> AddPet(Guid clientId, [FromBody] AddPetCommand request)
         {
-            request.ClientId = clientId;
-            var response = await _mediator.Send(request);
+            var requestWithClientId = request with { ClientId = clientId };
+            var response = await _mediator.Send(requestWithClientId);
 
             if (response.Error)
             {

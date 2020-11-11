@@ -13,19 +13,19 @@ using System.Threading.Tasks;
 namespace PetShop.Domain.Application.Clients.Commands.UpdateClient
 {
 
-    public class UpdateClientCommand : IRequestWrapper<UpdateClientResponse>
+    public record UpdateClientCommand : IRequestWrapper<UpdateClientResponse>
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
+        public Guid Id { get; init; }
+        public string Name { get; init; } = string.Empty;
 
     }
 
 
-    public class UpdateClientResponse 
+    public record UpdateClientResponse 
     {
         [Required]
-        public Guid Id { get; set; }
-        public string Name { get; set; }
+        public Guid Id { get; init; }
+        public string Name { get; init; } = string.Empty;
     }
 
 

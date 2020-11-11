@@ -13,15 +13,15 @@ using PetShop.Domain.Application.Clients.Dto;
 
 namespace PetShop.Domain.Application.Clients.Commands.CreateClient
 {
-    public class CreateClientCommand : IRequestWrapper<CreateClientResponse>
+    public record CreateClientCommand : IRequestWrapper<CreateClientResponse>
     {
-        public string Name { get; set; }
+        public string Name { get; init; } = string.Empty;
     }
 
-    public class CreateClientResponse
+    public record CreateClientResponse
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
+        public Guid Id { get; init; }
+        public string Name { get; init; } = string.Empty;
     }
 
     public class CreateClientCommandHandler : IHandlerWrapper<CreateClientCommand, CreateClientResponse>

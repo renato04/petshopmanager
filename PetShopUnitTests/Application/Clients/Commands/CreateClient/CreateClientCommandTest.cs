@@ -21,14 +21,19 @@ namespace PetShopUnitTests.Application.Clients.Commands.CreateClient
         public async Task ShouldCreate_A_Client()
         {
             string name = "Vader";
+            Guid clientId = Guid.NewGuid();
 
-            var request = new CreateClientCommand {  Name = name };
-            var expected = new CreateClientResponse { Name = name };
+            var request = new CreateClientCommand { Name = name };
+            var expected = new CreateClientResponse { Name = name, Id = clientId };
 
             var mapper = PetShopMappingConfiguration.GetPetShopMappings();
             var mockRepository = new Mock<IClientRepository>();
 
-            mockRepository.Setup(p => p.Add(It.Is<Client>(c => c.Name == name)));
+            mockRepository.Setup(p => p.Add(It.Is<Client>(c => c.Name == name)))
+                .Returns((Client client) => Task.Run(() =>
+                {
+                    client.Id = clientId;
+                }));
 
             var handler = new CreateClientCommandHandler(mapper, mockRepository.Object);
 

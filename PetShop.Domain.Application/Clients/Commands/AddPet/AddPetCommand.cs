@@ -10,17 +10,18 @@ using System.Threading.Tasks;
 
 namespace PetShop.Domain.Application.Clients.Commands.AddPet
 {
-    public class AddPetCommand : IRequestWrapper<AddPetResponse>
+    
+    public record AddPetCommand : IRequestWrapper<AddPetResponse>
     {
-        public string Name { get; set; }
-        public Guid ClientId { get; set; }
+        public string Name { get; init; } = string.Empty;
+        public Guid ClientId { get; init; }
     }
 
-    public class AddPetResponse
+    public record AddPetResponse
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public Guid ClientId { get; set; }
+        public Guid Id { get; init; }
+        public string Name { get; init; } = string.Empty;
+        public Guid ClientId { get; init; }
     }
 
     public class AddPetCommandHandler : IHandlerWrapper<AddPetCommand, AddPetResponse>

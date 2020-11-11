@@ -7,7 +7,7 @@ namespace PetShop.Domain.Models
     public class Client : IEntity
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public List<Pet> Pets { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public List<Pet> Pets { get; set; } = new List<Pet>();
     }
 }

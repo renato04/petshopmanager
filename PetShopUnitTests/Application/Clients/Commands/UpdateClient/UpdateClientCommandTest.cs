@@ -21,7 +21,7 @@ namespace PetShopUnitTests.Application.Clients.Commands.UpdateClient
         public async Task ShouldUpdate_A_Client()
         {
             var name = "Vader";
-            var request = new UpdateClientCommand { Name = name };
+            var request = new UpdateClientCommand { Name = name, Id = Guid.NewGuid() };
 
             var mapper = PetShopMappingConfiguration.GetPetShopMappings();
             var mockRepository = new Mock<IClientRepository>();

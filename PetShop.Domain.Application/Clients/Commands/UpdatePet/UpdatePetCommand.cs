@@ -12,17 +12,8 @@ using System.Threading.Tasks;
 
 namespace PetShop.Domain.Application.Clients.Commands.UpdatePet
 {
-    public class UpdatePetCommand : IRequestWrapper<UpdatePetResponse>
-    {
-        public string Name { get; set; }
-        public Guid ClientId { get; set; }
-    }
-
-    public class UpdatePetResponse
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-    }
+    public record UpdatePetCommand(string Name, Guid ClientId) : IRequestWrapper<UpdatePetResponse>;
+    public record UpdatePetResponse(string Name, Guid ClientId);
 
 
     public class UpdatePetCommandHandler : IHandlerWrapper<UpdatePetCommand, UpdatePetResponse>

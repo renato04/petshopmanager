@@ -24,8 +24,8 @@ namespace PetShopUnitTests.Application.Clients.Commands.AddPet
 
             var clientId = Guid.NewGuid();
 
-            var request = new AddPetCommand {  Name = name , ClientId = clientId };
-            var expected = new AddPetResponse { Name = name, Id = new Guid("994aa42a-e292-42f1-b5d4-749cd19a4d29"), ClientId = clientId };
+            var request = new AddPetCommand{  Name = name , ClientId = clientId };
+            var expected = new AddPetResponse { Id = new Guid("994aa42a-e292-42f1-b5d4-749cd19a4d29"), Name = name, ClientId = clientId };
 
             var mapper = PetShopMappingConfiguration.GetPetShopMappings();
             var mockRepository = new Mock<IPetRepository>();
