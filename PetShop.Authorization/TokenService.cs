@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PetShop.Domain.Models;
 using System;
@@ -19,7 +20,7 @@ namespace PetShop.Authorization
         }
 
 
-        public string GenerateToken(User user)
+        public string GenerateToken(IdentityUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_secret);
@@ -27,8 +28,8 @@ namespace PetShop.Authorization
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Username.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role.ToString())
+                    new Claim(ClaimTypes.Name, user.UserName.ToString()),
+                    //new Claim(ClaimTypes.Role, user.Role.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -36,5 +37,12 @@ namespace PetShop.Authorization
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+    }
+
+    public class TokenConfigurations
+    {
+        public string Audience { get; set; }
+        public string Issuer { get; set; }
+        public int Seconds { get; set; }
     }
 }

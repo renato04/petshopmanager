@@ -13,9 +13,9 @@ namespace PetShop.Infrastructure.Data.Context
 
         }
 
-        public PetShopDbContext(DbContextOptions options) : base(options) { }
+        public PetShopDbContext(DbContextOptions<PetShopDbContext> options) : base(options) { }
 
-        public virtual DbSet<Pet> Pets { get; set; }
-        public virtual DbSet<Client> Clients { get; set; }
+        public virtual DbSet<Pet>? Pets { get; set; }
+        public virtual DbSet<Client>? Clients { get; set; }
     }
 }

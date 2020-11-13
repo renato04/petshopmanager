@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PetShop.Api.Pet.Models;
 using PetShop.Authorization;
@@ -24,16 +25,39 @@ namespace PetShop.Api.Pet.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
-        public async Task<ActionResult<LoggedUser>> Authenticate([FromBody] User model)
+        public async Task<ActionResult<LoggedUser>> Authenticate([FromBody] User model,
+           [FromServices] UserManager<IdentityUser> userManager,
+            [FromServices] SignInManager<IdentityUser> signInManager,
+            [FromServices] SigningConfigurations signingConfigurations,
+            [FromServices] TokenConfigurations tokenConfigurations)
         {
-            var user = await _userRepository.Get(model.Username, model.Password);
+            var userIdentity = userManager
+                .FindByNameAsync(model.Username).Result;
+            if (userIdentity != null)
+            {
+                // Efetua o login com base no Id do usuário e sua senha
+                var resultadoLogin = signInManager
+                    .CheckPasswordSignInAsync(userIdentity, model.Password, false)
+                    .Result;
+                if (!resultadoLogin.Succeeded)
+                {
+                    return NotFound("Usuário ou senha inválidos");
+                    // Verifica se o usuário em questão possui
+                    // a role Acesso-APIAlturas
+                    //credenciaisValidas = userManager.IsInRoleAsync(
+                    //    userIdentity, Roles.ROLE_API_ALTURAS).Result;
+                }
 
-            if (user == null)
+                var token = _tokenService.GenerateToken(userIdentity);
+
+                return new LoggedUser(userIdentity.UserName, "", token);
+            }
+            else
+            {
                 return NotFound("Usuário ou senha inválidos");
+            }
 
-            var token = _tokenService.GenerateToken(user);
-
-            return new LoggedUser(user.Username,  user.Role, token);
+   
         }
     }
 }

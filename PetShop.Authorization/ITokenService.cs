@@ -1,9 +1,10 @@
-﻿using PetShop.Domain.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using PetShop.Domain.Models;
 
 namespace PetShop.Authorization
 {
     public interface ITokenService
     {
-        string GenerateToken(User user);
+        string GenerateToken(IdentityUser user);
     }
 }
