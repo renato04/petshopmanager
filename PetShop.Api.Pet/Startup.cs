@@ -14,6 +14,11 @@ using PetShop.Domain.Application.Clients.Commands.CreateClient;
 using FluentValidation;
 using PetShop.Api.Pet.Behaviours;
 using PetShop.Domain.Application;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using PetShop.Authorization;
+using System.Collections.Generic;
+using Swashbuckle.AspNetCore.Filters;
+using System;
 
 namespace PetShop.Api.Pet
 {
@@ -29,6 +34,7 @@ namespace PetShop.Api.Pet
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddMvc();
             services.AddControllers();
 
@@ -36,10 +42,33 @@ namespace PetShop.Api.Pet
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
                 c.EnableAnnotations();
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please insert JWT with Bearer into field",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                    },
+                    new string[] { }
+                }
+                });
+                //c.OperationFilter<SecurityRequirementsOperationFilter>();
+
             });
 
             services.AddSingleton(PetShopMappingConfiguration.GetPetShopMappings());
-            
+
             services.AddPetShopDependecies();
             services.AddDbContext<PetShopDbContext>(options =>
             {
@@ -53,6 +82,14 @@ namespace PetShop.Api.Pet
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            });
+
+            services.AddPetShopAuthentication(Configuration);
 
 
         }
@@ -69,6 +106,12 @@ namespace PetShop.Api.Pet
 
             app.UseRouting();
 
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseSwagger();

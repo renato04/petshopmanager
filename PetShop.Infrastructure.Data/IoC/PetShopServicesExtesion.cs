@@ -11,6 +11,7 @@ namespace PetShop.Infrastructure.IoC
         {
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
     }
 }

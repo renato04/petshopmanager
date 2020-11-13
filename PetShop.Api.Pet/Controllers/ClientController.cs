@@ -10,6 +10,7 @@ using PetShop.Domain.Application.Clients.Dto;
 using PetShop.Domain.Application.Clients.Commands.UpdateClient;
 using PetShop.Domain.Application.Clients.Commands.CreateClient;
 using PetShop.Domain.Application.Clients.Commands.AddPet;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PetShop.Api.Pet.Controllers
 {
@@ -25,6 +26,7 @@ namespace PetShop.Api.Pet.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [SwaggerOperation(Summary = "Update a client")]
         [SwaggerResponse(201, Description = "The client was successfully created.", Type = typeof(Response<ClientDto>))]
         public async Task<ActionResult<Response<UpdateClientResponse>>> UpdateClient([FromBody] UpdateClientCommand request)
@@ -43,6 +45,7 @@ namespace PetShop.Api.Pet.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [SwaggerOperation(Summary = "Create a client")]
         [SwaggerResponse(201, Description = "The client was successfully created.", Type = typeof(Response<ClientDto>))]
         public async Task<ActionResult<Response<CreateClientResponse>>> CreateClient([FromBody] CreateClientCommand request)
@@ -61,6 +64,7 @@ namespace PetShop.Api.Pet.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("{clientId}/pet")]
         [SwaggerOperation(Summary = "Add a pet to a client")]
         [SwaggerResponse(201, Description = "The pet was successfully added.", Type = typeof(Response<PetDto>))]
@@ -81,6 +85,7 @@ namespace PetShop.Api.Pet.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("{clientId}")]
         [SwaggerOperation(Summary = "Get a client")]
         [SwaggerResponse(200, Description = "The client.", Type = typeof(Response<ClientDto>))]
