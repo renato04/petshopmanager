@@ -1,17 +1,12 @@
 ﻿using FluentAssertions;
-using NUnit.Framework;
 using PetShop.Domain.Application.Clients.Commands.UpdateClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Xunit;
 
 namespace PetShopUnitTests.Application.Clients.Commands.UpdateClient
 {
     public class UpdateClientCommandValidtorTest
     {
-        [Test]
+        [Fact]
         public void Shoud_have_error_when_name_is_empty()
         {
             var validator = new UpdateClientCommandValidator();

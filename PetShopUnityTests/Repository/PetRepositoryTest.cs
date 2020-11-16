@@ -2,23 +2,22 @@
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
-using NUnit.Framework;
 using PetShop.Domain.Models;
 using PetShop.Infrastructure.Data.Context;
 using PetShop.Infrastructure.Data.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace PetShopUnitTests.Repository
 {
     public class PetRepositoryTest
     {
 
-        [Test]
+        [Fact]
         public async Task Should_Add_A_Pet()
         {
             var mockSet = new Mock<DbSet<Pet>>();
@@ -30,7 +29,7 @@ namespace PetShopUnitTests.Repository
             mockContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once());
         }
 
-        [Test]
+        [Fact]
         public async Task GetAllPets_by_client_orders_by_name()
         {
             var id = new Guid("994aa42a-e292-42f1-b5d4-749cd19a4d29");
@@ -46,14 +45,14 @@ namespace PetShopUnitTests.Repository
             mockContext.Setup(c => c.Pets).Returns(data.Object);
 
             var repository = new PetRepository(mockContext.Object);
-            var clients = await repository.GetAllByClient(id);
+            var pets = await repository.GetAllByClient(id);
 
-            Assert.AreEqual(2, clients.Count());
-            Assert.AreEqual("BBB", clients.ElementAt(0).Name);
-            Assert.AreEqual("ZZZ", clients.ElementAt(1).Name);
+            pets.Count().Should().Be(2);
+            pets.ElementAt(0).Name.Should().BeEquivalentTo("BBB");
+            pets.ElementAt(1).Name.Should().BeEquivalentTo("ZZZ");
         }
 
-        [Test]
+        [Fact]
         public async Task GetPetById()
         {
             var id = new Guid("994aa42a-e292-42f1-b5d4-749cd19a4d29");

@@ -1,23 +1,19 @@
 ﻿using FluentAssertions;
 using Moq;
-using NUnit.Framework;
-using PetShop.Domain.Application.Clients.Commands;
 using PetShop.Domain.Application.Clients.Commands.UpdateClient;
-using PetShop.Domain.Application.Clients.Dto;
 using PetShop.Domain.Application.Mapping;
 using PetShop.Domain.Models;
 using PetShop.Domain.Models.Repository;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace PetShopUnitTests.Application.Clients.Commands.UpdateClient
 {
     public class UpdateClientCommandTest
     {
-        [Test]
+        [Fact]
         public async Task ShouldUpdate_A_Client()
         {
             var name = "Vader";

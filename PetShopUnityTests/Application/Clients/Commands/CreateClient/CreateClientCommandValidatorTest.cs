@@ -1,17 +1,12 @@
 ﻿using FluentAssertions;
-using NUnit.Framework;
 using PetShop.Domain.Application.Clients.Commands.CreateClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Xunit;
 
 namespace PetShopUnitTests.Application.Clients.Commands.CreateClient
 {
     public class CreateClientCommandValidatorTest
     {
-        [Test]
+        [Fact]
         public void Shoud_have_error_when_name_is_empty()
         {
             var validator = new CreateClientCommandValidator();

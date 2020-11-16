@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Moq;
-using NUnit.Framework;
 using PetShop.Domain.Application.Clients.Commands;
 using PetShop.Domain.Application.Clients.Commands.AddPet;
 using PetShop.Domain.Application.Clients.Dto;
@@ -12,12 +11,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace PetShopUnitTests.Application.Clients.Commands.AddPet
 {
     public class AddPetCommandTest
     {
-        [Test]
+        [Fact]
         public async Task ShouldAdd_A_Pet()
         {
             string name = "Vader";
