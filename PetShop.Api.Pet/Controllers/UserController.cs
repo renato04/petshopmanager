@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PetShop.Api.Pet.Models;
 using PetShop.Domain.Models;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +16,23 @@ namespace PetShop.Api.Pet.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult Test()
+        [HttpPost]
+        [AllowAnonymous]
+        [SwaggerOperation(Summary = "Register a system user")]
+        [SwaggerResponse(200, Description = "User registered", Type = typeof(IEnumerable<RegisterResultModel>))]
+        [SwaggerResponse(409, Description = "Registration failed", Type = typeof(IEnumerable<RegisterResultModel>))]
+        public async Task<ActionResult<RegisterResultModel>> Post([FromBody] RegisterUserModel model, [FromServices] UserManager<IdentityUser> userManager)
         {
-            //var user = new User { Password = "1234", Username = "renato" };
-            //var p = new PasswordHasher();
-            //var hash = p.HashPassword(new User(), user.Password);
+            var identityUser = new IdentityUser { UserName = model.Username, Email = model.Username };
 
-            return Ok("");
+            var result = await userManager.CreateAsync(identityUser, model.Password);
+
+            if(!result.Succeeded)
+            {
+                return Conflict(new RegisterResultModel{Succesful = false, Errors = result.Errors.Select(x => x.Description) });
+            }
+
+            return Ok(new RegisterResultModel { Succesful = true });
 
         }
     }

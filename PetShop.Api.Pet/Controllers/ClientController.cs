@@ -11,6 +11,7 @@ using PetShop.Domain.Application.Clients.Commands.UpdateClient;
 using PetShop.Domain.Application.Clients.Commands.CreateClient;
 using PetShop.Domain.Application.Clients.Commands.AddPet;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace PetShop.Api.Pet.Controllers
 {
@@ -92,6 +93,25 @@ namespace PetShop.Api.Pet.Controllers
         public async Task<ActionResult<Response<ClientDto>>> GetClient(Guid clientId)
         {
             var response = await _mediator.Send(new GetClientByIdQuery { Id = clientId });
+
+            if (response.Error)
+            {
+                return BadRequest(response.Message);
+            }
+            else
+            {
+                return Ok(response);
+
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        [SwaggerOperation(Summary = "Get all clients")]
+        [SwaggerResponse(200, Description = "The client.", Type = typeof(IEnumerable<Response<ClientDto>>))]
+        public async Task<ActionResult<Response<ClientDto>>> GetClients()
+        {
+            var response = await _mediator.Send(new GetAllClientsQuery());
 
             if (response.Error)
             {

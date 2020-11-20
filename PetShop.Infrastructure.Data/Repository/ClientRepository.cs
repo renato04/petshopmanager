@@ -14,14 +14,14 @@ namespace PetShop.Infrastructure.Data.Repository
     {
         private PetShopDbContext _context;
 
-        public ClientRepository(PetShopDbContext context)
+        public ClientRepository(PetShopDbContext context) 
         {
             _context = context;
         }
 
         public async Task Add(Client client)
         {
-            _context.Clients.Add(client);
+            _context.Clients!.Add(client);
             await _context.SaveChangesAsync();
         }
 
@@ -33,12 +33,12 @@ namespace PetShop.Infrastructure.Data.Repository
 
         public async Task<IEnumerable<Client>> GetAll()
         {
-            return await _context.Clients.OrderBy(p => p.Name).ToListAsync();
+            return await _context.Clients!.OrderBy(p => p.Name).ToListAsync();
         }
 
         public async Task<Client> GetById(Guid id)
         {
-            return await _context.Clients.Include(p => p.Pets).FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Clients!.Include(p => p.Pets).FirstOrDefaultAsync(p => p.Id == id);
         }
 
 

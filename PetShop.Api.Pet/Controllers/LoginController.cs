@@ -25,11 +25,9 @@ namespace PetShop.Api.Pet.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
-        public async Task<ActionResult<LoggedUser>> Authenticate([FromBody] User model,
+        public ActionResult<LoggedUser> Authenticate([FromBody] User model,
            [FromServices] UserManager<IdentityUser> userManager,
-            [FromServices] SignInManager<IdentityUser> signInManager,
-            [FromServices] SigningConfigurations signingConfigurations,
-            [FromServices] TokenConfigurations tokenConfigurations)
+            [FromServices] SignInManager<IdentityUser> signInManager)
         {
             var userIdentity = userManager
                 .FindByNameAsync(model.Username).Result;
@@ -37,7 +35,7 @@ namespace PetShop.Api.Pet.Controllers
             {
                 // Efetua o login com base no Id do usuário e sua senha
                 var resultadoLogin = signInManager
-                    .CheckPasswordSignInAsync(userIdentity, model.Password, false)
+                    .PasswordSignInAsync(userIdentity, model.Password, false, false)
                     .Result;
                 if (!resultadoLogin.Succeeded)
                 {

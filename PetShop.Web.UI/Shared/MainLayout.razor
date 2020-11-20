@@ -1,0 +1,101 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Http
+@using Radzen.Blazor
+@using PetShop.Web.UI.Services
+@using PetShop.Web.UI.Models
+
+@inherits LayoutComponentBase
+@inject MenuService MenuService
+@inject NavigationManager UriHelper
+@inject IHttpContextAccessor httpContextAccessor
+
+<RadzenDialog />
+<RadzenNotification />
+<RadzenTooltip />
+<RadzenContextMenu />
+
+<RadzenHeader>
+    <ChildContent>
+        <div class="row justify-content-start align-items-center">
+            <div class="col-6 d-flex align-items-center">
+                <RadzenSidebarToggle Click="@(args => { sidebarExpanded = !sidebarExpanded; bodyExpanded = !bodyExpanded; })">
+                </RadzenSidebarToggle>
+                <RadzenLabel Text="Radzen Blazor Components">
+                </RadzenLabel>
+            </div>
+        </div>
+    </ChildContent>
+</RadzenHeader>
+<div style="width:100%">
+    <RadzenBody @ref="@body0" @bind-Expanded="@bodyExpanded">
+        <ChildContent>
+            <RadzenContentContainer Name="main">
+                @Body
+            </RadzenContentContainer>
+        </ChildContent>
+    </RadzenBody>
+</div>
+<RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded">
+    <ChildContent>
+        
+        <RadzenPanelMenu>
+            @foreach (var category in menus)
+            {
+                <RadzenPanelMenuItem @bind-Expanded="@category.Expanded" Text="@category.Name" Path="@category.Path" Icon="@category.Icon">
+                    @if (category.Children != null)
+                    {
+                        @foreach (var example in category.Children)
+                        {
+                            <RadzenPanelMenuItem Text="@example.Name" Path="@example.Path" Icon="@example.Icon" />
+                        }
+                    }
+                </RadzenPanelMenuItem>
+            }
+        </RadzenPanelMenu>
+    </ChildContent>
+</RadzenSidebar>
+<RadzenFooter>
+    <ChildContent>
+        <RadzenLabel Text="Radzen Blazor Components, Copyright &copy; 2020">
+        </RadzenLabel>
+    </ChildContent>
+</RadzenFooter>
+@code {
+    RadzenSidebar sidebar0;
+    RadzenBody body0;
+    bool sidebarExpanded = true;
+    bool bodyExpanded = false;
+
+    dynamic themes = new[]
+    {
+        new { Text = "Default", Value = "default"},
+        new { Text = "Dark", Value="dark" },
+        new { Text = "Software", Value = "software"},
+        new { Text = "Humanistic", Value = "humanistic" }
+    };
+
+    IEnumerable<Menu> menus;
+
+
+    protected override void OnInitialized()
+    {
+        if (httpContextAccessor != null && httpContextAccessor.HttpContext != null &&
+             httpContextAccessor.HttpContext.Request != null && httpContextAccessor.HttpContext.Request.Headers.ContainsKey("User-Agent"))
+        {
+            var userAgent = httpContextAccessor.HttpContext.Request.Headers["User-Agent"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(userAgent))
+            {
+                if (userAgent.Contains("iPhone") || userAgent.Contains("Android") || userAgent.Contains("Googlebot"))
+                {
+                    sidebarExpanded = false;
+                    bodyExpanded = true;
+                }
+            }
+        }
+
+        menus = MenuService.Menus;
+
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+    }
+
+}
