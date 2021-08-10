@@ -1,0 +1,55 @@
+﻿@page "/administrador"
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<IdentityUser> _UserManager
+@inject RoleManager<IdentityRole> _RoleManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+<h3>Administração</h3>
+<AuthorizeView>
+    <Authorized>
+        @if (@context.User.IsInRole(ADMINISTRATION_ROLE))
+        {
+            <p>Você esta com perfil : @ADMINISTRATION_ROLE </p>
+        }
+        else
+        {
+            <p>Você não esta logado como um perfil de : @ADMINISTRATION_ROLE.</p>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Você não esta logado.</p>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    string ADMINISTRATION_ROLE = "Administrators";
+
+    System.Security.Claims.ClaimsPrincipal UsuarioAtual;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Verifica se existe um ADMINISTRATION_ROLE
+        var RoleResult = await _RoleManager.FindByNameAsync(ADMINISTRATION_ROLE);
+        if (RoleResult == null)
+        {
+            // Cria o perfil ADMINISTRATION_ROLE
+            await _RoleManager.CreateAsync(new IdentityRole(ADMINISTRATION_ROLE));
+        }
+        // Verifica que o usuário chamado Admin@BlazorHelp.com é um Administrador
+        var user = await _UserManager.FindByNameAsync("Admin@BlazorHelp.com");
+        if (user != null)
+        {
+            // O usuário Admin@BlazorHelp.com esta no perfil de administrador?
+            var UserResult = await _UserManager.IsInRoleAsync(user, ADMINISTRATION_ROLE);
+            if (!UserResult)
+            {
+                // Põe o admin no perfil Administrator
+                await _UserManager.AddToRoleAsync(user, ADMINISTRATION_ROLE);
+            }
+        }
+        // Obtem o usuário logado atual
+        UsuarioAtual = (await authenticationStateTask).User;
+    }
+}

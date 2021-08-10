@@ -8,7 +8,7 @@ namespace PetShop.Domain.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public Client Client { get; set; } = new Client();
+        public Client Client { get; set; } = null!;
         public Guid ClientId { get; set; }
     }
 }

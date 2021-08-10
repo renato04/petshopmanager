@@ -3,11 +3,13 @@
 @using Radzen.Blazor
 @using PetShop.Web.UI.Services
 @using PetShop.Web.UI.Models
+@using Microsoft.AspNetCore.Mvc.ViewEngines
 
 @inherits LayoutComponentBase
 @inject MenuService MenuService
 @inject NavigationManager UriHelper
 @inject IHttpContextAccessor httpContextAccessor
+@inject ICompositeViewEngine Engine
 
 <RadzenDialog />
 <RadzenNotification />
@@ -17,11 +19,14 @@
 <RadzenHeader>
     <ChildContent>
         <div class="row justify-content-start align-items-center">
-            <div class="col-6 d-flex align-items-center">
+            <div class="col-12 d-flex align-items-center">
                 <RadzenSidebarToggle Click="@(args => { sidebarExpanded = !sidebarExpanded; bodyExpanded = !bodyExpanded; })">
                 </RadzenSidebarToggle>
                 <RadzenLabel Text="Radzen Blazor Components">
                 </RadzenLabel>
+                <div class="d-flex align-items-end">
+                    <LoginDisplay />
+                </div>
             </div>
         </div>
     </ChildContent>
@@ -37,7 +42,7 @@
 </div>
 <RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded">
     <ChildContent>
-        
+
         <RadzenPanelMenu>
             @foreach (var category in menus)
             {

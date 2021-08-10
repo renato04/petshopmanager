@@ -1,0 +1,274 @@
+﻿@page "/client"
+
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Identity;
+@using PetShop.Infrastructure.Data.Context
+@using Microsoft.EntityFrameworkCore
+@using PetShop.Domain.Models
+@inject UserManager<IdentityUser> _UserManager
+@inject RoleManager<IdentityRole> _RoleManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PetShopDbContext  dbContext
+
+<h3>Clientes</h3>
+
+@*<AuthorizeView>
+    <Authorized>
+        @if (@context.User.IsInRole(ADMINISTRATION_ROLE))
+        {*@
+@if (clients == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+<div class="row">
+    <div class="col-md-6">
+        <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Click="@InsertClientRow" />
+        <RadzenGrid @ref="clientsGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
+                    Data="@clients" TItem="Client" RowUpdate="@OnUpdateClientRow" RowCreate="@OnCreateClientRow" RowSelect="@SelectClientRow">
+            <Columns>
+                <RadzenGridColumn Width="100px" TItem="Client" Property="Id" Title="Id" />
+                <RadzenGridColumn Width="200px" TItem="Client" Property="Name" Title="Nome">
+                    <EditTemplate Context="client">
+                        <RadzenTextBox @bind-Value="client.Name" Style="width:100%; display: block" Name="Nome" />
+                    </EditTemplate>
+                </RadzenGridColumn>
+                <RadzenGridColumn TItem="Client" Context="sampleBlazorModelsSampleOrder" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+                    <Template Context="client">
+                        <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditClientRow(client))">
+                        </RadzenButton>
+                    </Template>
+                    <EditTemplate Context="client">
+                        <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SaveClientRow(client))">
+                        </RadzenButton>
+                        <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelClientEdit(client))">
+                        </RadzenButton>
+                    </EditTemplate>
+                </RadzenGridColumn>
+            </Columns>
+        </RadzenGrid>
+    </div>
+    <div class="col-md-6">
+        <RadzenCard Style="margin-bottom:20px">
+            <b>@client?.Name</b>
+        </RadzenCard>
+        <RadzenTabs>
+            <Tabs>
+                <RadzenTabsItem Text="Pets">
+                    <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Click="@InsertPetRow" />
+                    <RadzenGrid @ref="petsGrid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@client.Pets" TItem="Pet"
+                                EditMode="DataGridEditMode.Single" RowUpdate="@OnUpdatePetRow" RowCreate="@OnCreatePetRow" >
+                        <Columns>
+                            <RadzenGridColumn Width="200px" TItem="Pet" Property="Name" Title="Nome">
+                                <EditTemplate Context="pet">
+                                    <RadzenTextBox @bind-Value="pet.Name" Style="width:100%; display: block" Name="Nome" />
+                                </EditTemplate>
+                            </RadzenGridColumn>
+                            <RadzenGridColumn TItem="Pet" Context="sampleBlazorModelsSampleOrder" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+                                <Template Context="pet">
+                                    <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditPetRow(pet))">
+                                    </RadzenButton>
+                                </Template>
+                                <EditTemplate Context="pet">
+                                    <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SavePetRow(pet))">
+                                    </RadzenButton>
+                                    <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelPetEdit(pet))">
+                                    </RadzenButton>
+                                </EditTemplate>
+                            </RadzenGridColumn>
+                            <RadzenGridColumn TItem="Pet" Context="order" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+                                <Template Context="pet">
+                                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeletePetRow(pet))">
+                                    </RadzenButton>
+                                </Template>
+                                <EditTemplate Context="pet">
+                                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeletePetRow(pet))">
+                                    </RadzenButton>
+                                </EditTemplate>
+                            </RadzenGridColumn>
+                        </Columns>
+                    </RadzenGrid>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+    </div>
+</div>
+
+}
+
+@*}
+            else
+            {
+                <p>Você não esta logado como um perfil de : @ADMINISTRATION_ROLE.</p>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <p>Você não esta logado.</p>
+        </NotAuthorized>
+    </AuthorizeView>*@
+
+@code {
+    RadzenGrid<Client> clientsGrid;
+    RadzenGrid<Pet> petsGrid;
+    IList<Client> clients;
+    Client client;
+
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    string ADMINISTRATION_ROLE = "Administrators";
+
+    System.Security.Claims.ClaimsPrincipal UsuarioAtual;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        clients = dbContext.Clients.Include(p => p.Pets).ToList();
+
+        client = clients.FirstOrDefault();
+    }
+
+    async Task EditClientRow(Client client)
+    {
+        await clientsGrid.EditRow(client);
+    }
+
+    void SelectClientRow(Client args)
+    {
+        client = args;
+    }
+
+    async Task OnUpdateClientRow(Client client)
+    {
+        dbContext.Update(client);
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    async Task SaveClientRow(Client client)
+    {
+        await clientsGrid.UpdateRow(client);
+
+        clients.Add(client);
+
+    }
+
+    void CancelClientEdit(Client client)
+    {
+        clientsGrid.CancelEditRow(client);
+
+        var clientEntry = dbContext.Entry(client);
+        if (clientEntry.State == EntityState.Modified)
+        {
+            clientEntry.CurrentValues.SetValues(clientEntry.OriginalValues);
+            clientEntry.State = EntityState.Unchanged;
+        }
+    }
+
+    async Task DeleteClientRow(Client client)
+    {
+        if (clients.Contains(client))
+        {
+            dbContext.Remove<Client>(client);
+
+            // For demo purposes only
+            clients.Remove(client);
+
+            // For production
+            await dbContext.SaveChangesAsync();
+
+            await clientsGrid.Reload();
+
+        }
+        else
+        {
+            clientsGrid.CancelEditRow(client);
+        }
+    }
+
+    async Task InsertClientRow()
+    {
+        await clientsGrid.InsertRow(new Client());
+    }
+
+    async Task OnCreateClientRow(Client client)
+    {
+        dbContext.Add(client);
+
+        // For production
+        await dbContext.SaveChangesAsync();
+
+    }
+
+    async Task EditPetRow(Pet pet)
+    {
+        await petsGrid.EditRow(pet);
+    }
+
+    async Task OnUpdatePetRow(Pet pet)
+    {
+        dbContext.Update(pet);
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    async Task SavePetRow(Pet pet)
+    {
+        await petsGrid.UpdateRow(pet);
+
+        client.Pets.Add(pet);
+
+    }
+
+    void CancelPetEdit(Pet pet)
+    {
+        petsGrid.CancelEditRow(pet);
+
+        var clientEntry = dbContext.Entry(pet);
+        if (clientEntry.State == EntityState.Modified)
+        {
+            clientEntry.CurrentValues.SetValues(clientEntry.OriginalValues);
+            clientEntry.State = EntityState.Unchanged;
+        }
+    }
+
+    async Task DeletePetRow(Pet pet)
+    {
+        if (client.Pets.Contains(pet))
+        {
+            dbContext.Remove<Pet>(pet);
+
+            // For demo purposes only
+            client.Pets.Remove(pet);
+
+            // For production
+            await dbContext.SaveChangesAsync();
+
+            await petsGrid.Reload();
+
+        }
+        else
+        {
+            petsGrid.CancelEditRow(pet);
+        }
+    }
+
+    async Task InsertPetRow()
+    {
+        await petsGrid.InsertRow(new Pet() { });
+    }
+
+    async Task OnCreatePetRow(Pet pet)
+    {
+        pet.Client = client;
+        pet.ClientId = client.Id;
+        dbContext.Add(pet);
+
+        // For production
+        await dbContext.SaveChangesAsync();
+
+    }
+}

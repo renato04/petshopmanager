@@ -1,0 +1,344 @@
+﻿@page "/administrador"
+
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<IdentityUser> _UserManager
+@inject RoleManager<IdentityRole> _RoleManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>Administração</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in ColUsers)
+        {
+            <tr>
+                <td>@user.Id.Substring(0, 5) ...</td>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>
+                    <button class="btn btn-primary"
+                            @onclick="(() => EditaUser(user))">
+                        Editar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@*---------inicio inclusão de usuários---------------------*@
+@if (MostraPopup)
+{
+    <!-- Este popup permite criar ou editar um usuário -->
+    <div class="modal" tabindex="-1" style="display:block" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Cria/Edita Usuário</h3>
+                    <button type="button" class="close" @onclick="FechaPopup">
+                        <span aria-hidden="true">X</span>
+                    </button>
+                </div>
+                <!-- Edita o formulário para o usuário atual -->
+                <div class="modal-body">
+                    <!-- Somente mostra o ID se não for um novo usuário -->
+                    @if (objUser.Id != "")
+                    {
+                        <p>@objUser.Id</p>
+                    }
+                    <!-- somnete permite editar se for um novo usuario -->
+                    @if (objUser.Id != "")
+                    {
+                        <p>@objUser.UserName</p>
+                    }
+                    else
+                    {
+                        <input class="form-control" type="text" placeholder="Nome" @bind="objUser.UserName" />
+                    }
+                    <input class="form-control" type="text" placeholder="Email" @bind="objUser.Email" />
+                    <input class="form-control" type="password" placeholder="Password" @bind="objUser.PasswordHash" />
+                    <select class="form-control" @bind="@CurrentUserRole">
+                        @foreach (var option in Options)
+                        {
+                            <option value="@option">
+                                @option
+                            </option>
+                        }
+                    </select>
+                    <br /><br />
+                    <!-- Botão para salvar o usuário -->
+                    <button class="btn btn-primary" @onclick="SalvaUser">
+                        Salvar
+                    </button>
+                    <!-- Mostra o botão deletar se não for um novo registro -->
+                    @if (objUser.Id != "")
+                    {
+                        <!-- Button para deletar -->
+                        <button class="btn btn-danger" @onclick="DeletaUser">
+                            Deletar
+                        </button>
+                    }
+                    <br />
+                    <span style="color:red">@strError</span>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<button class="btn btn-success" @onclick="AdicionaNovoUser">Adicionar Usuário</button>
+
+@*---------fim da inclusão de usuários---------------------*@
+<AuthorizeView>
+    <Authorized>
+        @if (@context.User.IsInRole(ADMINISTRATION_ROLE))
+        {
+            <p>Você esta com perfil : @ADMINISTRATION_ROLE </p>
+        }
+        else
+        {
+            <p>Você não esta logado como um perfil de : @ADMINISTRATION_ROLE.</p>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Você não esta logado.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    // Propriedade usada para adicionar ou editar o usuário atual
+    IdentityUser objUser = new IdentityUser();
+
+    // Obtem a role selecionada para o usuário atual
+    string CurrentUserRole { get; set; } = "Users";
+
+    // Coleção para exibir os usuários existentes
+    List<IdentityUser> ColUsers = new List<IdentityUser>();
+
+    // Opções para exibir as roles na lista suspensa quando editar um usuário
+    List<string> Options = new List<string>() { "Users", "Administrators" };
+
+    // Trata erros
+    string strError = "";
+
+    // Habilita a exibição do Popup
+    bool MostraPopup = false;
+
+    void AdicionaNovoUser()
+    {
+        // cria um novo usuário
+        objUser = new IdentityUser();
+        objUser.PasswordHash = "*****";
+        // Definie o id como vazio
+        objUser.Id = "";
+        // abre o popup
+        MostraPopup = true;
+    }
+
+    async Task SalvaUser()
+    {
+        try
+        {
+            // É um usuário existente?
+            if (objUser.Id != "")
+            {
+                // obtem o usuário
+                var user = await _UserManager.FindByIdAsync(objUser.Id);
+                // atualiza Email
+                user.Email = objUser.Email;
+                // atualiza o usuário
+                await _UserManager.UpdateAsync(user);
+                // somente atualiza a senha se o o valor atual
+                // não for o valor padrão
+                if (objUser.PasswordHash != "*****")
+                {
+                    var resetToken = await _UserManager.GeneratePasswordResetTokenAsync(user);
+                    var passworduser = await _UserManager.ResetPasswordAsync(user, resetToken, objUser.PasswordHash);
+                    if (!passworduser.Succeeded)
+                    {
+                        if (passworduser.Errors.FirstOrDefault() != null)
+                        {
+                            strError = passworduser.Errors.FirstOrDefault().Description;
+                        }
+                        else
+                        {
+                            strError = "Erro na senha...";
+                        }
+                        // mantem o popup aberto
+                        return;
+                    }
+                }
+                // trata os perfis
+                // O usuário esta no perfil admin ?
+                var UserResult = await _UserManager.IsInRoleAsync(user, ADMINISTRATION_ROLE);
+                // O perfil Administrator foi selecionado
+                // mas o usuário náo é um  Administrator?
+                if ((CurrentUserRole == ADMINISTRATION_ROLE) & (!UserResult))
+                {
+                    // Poe o admin no perfil Administrator
+                    await _UserManager.AddToRoleAsync(user, ADMINISTRATION_ROLE);
+                }
+                else
+                {
+                    // O perifl Administrator não foi selecionado
+                    // mas o usuário é um Administrator ?
+                    if ((CurrentUserRole != ADMINISTRATION_ROLE) & (UserResult))
+                    {
+                        // Remove o usuário do perfil Administrator
+                        await _UserManager.RemoveFromRoleAsync(user, ADMINISTRATION_ROLE);
+                    }
+                }
+            }
+            else
+            {
+                // Insere um novo user
+                var NewUser = new IdentityUser
+                {
+                    UserName = objUser.UserName,
+                    Email = objUser.Email
+                };
+
+                var CreateResult = await _UserManager.CreateAsync(NewUser, objUser.PasswordHash);
+
+                if (!CreateResult.Succeeded)
+                {
+                    if (CreateResult.Errors.FirstOrDefault() != null)
+                    {
+                        strError = CreateResult.Errors.FirstOrDefault().Description;
+                    }
+                    else
+                    {
+                        strError = "Erro ao criar usuário...";
+                    }
+                    // mantem o popup aberto
+                    return;
+
+                }
+                else
+                {
+                    // Trata os perfis
+                    if (CurrentUserRole == ADMINISTRATION_ROLE)
+                    {
+                        // poe o admin no perfil Administrator
+                        await _UserManager.AddToRoleAsync(NewUser, ADMINISTRATION_ROLE);
+                    }
+                }
+            }
+            // fecha o Popup
+            MostraPopup = false;
+            // Atualiza os usuarios
+            GetUsers();
+        }
+        catch (Exception ex)
+        {
+            strError = ex.GetBaseException().Message;
+        }
+    }
+
+    async Task EditaUser(IdentityUser _IdentityUser)
+    {
+        // Define o usuario selecionado como o atual
+        objUser = _IdentityUser;
+        // Obtem o usuario
+        var user = await _UserManager.FindByIdAsync(objUser.Id);
+
+        if (user != null)
+        {
+            // O usuario esta no perfiel administrator ?
+            var UserResult = await _UserManager.IsInRoleAsync(user, ADMINISTRATION_ROLE);
+
+            if (UserResult)
+            {
+                CurrentUserRole = ADMINISTRATION_ROLE;
+            }
+            else
+            {
+                CurrentUserRole = "Users";
+            }
+        }
+        // Abre o popup
+        MostraPopup = true;
+    }
+
+    async Task DeletaUser()
+    {
+        // Fecha o Popup
+        MostraPopup = false;
+        // Obtem o usuário
+        var user = await _UserManager.FindByIdAsync(objUser.Id);
+        if (user != null)
+        {
+            // Deleta o usuario
+            await _UserManager.DeleteAsync(user);
+        }
+        // atualiza
+        GetUsers();
+    }
+
+    void FechaPopup()
+    {
+        // fecha o popup
+        MostraPopup = false;
+    }
+
+    public void GetUsers()
+    {
+        // limpa mensasgens de erro
+        strError = "";
+        // define a coleção para tratar os usuários
+        ColUsers = new List<IdentityUser>();
+        // Obtem os usuários a partir de _UserManager
+        var user = _UserManager.Users.Select(x => new IdentityUser
+        {
+            Id = x.Id,
+            UserName = x.UserName,
+            Email = x.Email,
+            PasswordHash = "********"
+        });
+        foreach (var item in user)
+        {
+            ColUsers.Add(item);
+        }
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    string ADMINISTRATION_ROLE = "Administrators";
+
+    System.Security.Claims.ClaimsPrincipal UsuarioAtual;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Verifica se existe um ADMINISTRATION_ROLE
+        var RoleResult = await _RoleManager.FindByNameAsync(ADMINISTRATION_ROLE);
+        if (RoleResult == null)
+        {
+            // Cria o perfil ADMINISTRATION_ROLE
+            await _RoleManager.CreateAsync(new IdentityRole(ADMINISTRATION_ROLE));
+        }
+        // Verifica que o usuário chamado Admin@BlazorHelp.com é um Administrador
+        var user = await _UserManager.FindByNameAsync("Admin@BlazorHelp.com");
+        if (user != null)
+        {
+            // O usuário Admin@BlazorHelp.com esta no perfil de administrador?
+            var UserResult = await _UserManager.IsInRoleAsync(user, ADMINISTRATION_ROLE);
+            if (!UserResult)
+            {
+                // Põe o admin no perfil Administrator
+                await _UserManager.AddToRoleAsync(user, ADMINISTRATION_ROLE);
+            }
+        }
+        // Obtem o usuário logado atual
+        UsuarioAtual = (await authenticationStateTask).User;
+
+        GetUsers();
+    }
+}

@@ -17,5 +17,11 @@ namespace PetShop.Infrastructure.Data.Context
 
         public virtual DbSet<Pet>? Pets { get; set; }
         public virtual DbSet<Client>? Clients { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.LogTo(Console.WriteLine);
+        }
     }
 }

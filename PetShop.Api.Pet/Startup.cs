@@ -141,10 +141,7 @@ namespace PetShop.Api.Pet
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
-             ApplicationDbContext context,
-            UserManager<IdentityUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -169,9 +166,6 @@ namespace PetShop.Api.Pet
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
-
-            new IdentityInitializer(context, userManager, roleManager)
-                            .Initialize();
 
             app.UseEndpoints(endpoints =>
             {

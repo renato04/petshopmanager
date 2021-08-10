@@ -1,10 +1,18 @@
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PetShop.Infrastructure.Data.Context;
+using PetShop.Infrastructure.IoC;
+using PetShop.Web.UI.Areas.Identity;
 using PetShop.Web.UI.Data;
 using PetShop.Web.UI.Services;
 using Radzen;
@@ -12,8 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Refit;
-using PetShop.Web.UI.ThirdPartyServices;
 
 namespace PetShop.Web.UI
 {
@@ -30,10 +36,23 @@ namespace PetShop.Web.UI
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpContextAccessor();
+            services.AddPetShopDependecies();
+            services.AddDbContext<PetShopDbContext>(options =>
+                  options
+                        .UseSqlServer(
+                        Configuration.GetConnectionString("PetShopConnection")));
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                        options.UseSqlServer(
+                        Configuration.GetConnectionString("IdentityConnection")));
+
+            services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+            services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
 
             services.AddScoped<DialogService>();
@@ -43,7 +62,6 @@ namespace PetShop.Web.UI
 
             services.AddScoped<MenuService>();
 
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +70,7 @@ namespace PetShop.Web.UI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseMigrationsEndPoint();
             }
             else
             {
@@ -62,10 +81,15 @@ namespace PetShop.Web.UI
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });

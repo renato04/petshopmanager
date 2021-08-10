@@ -23,9 +23,16 @@ namespace PetShop.Web.UI.Services
             },
             new Menu
             {
-                Name = "Get Started",
-                Title = "How to get started with the Radzen Blazor components",
-                Path = "/get-started",
+                Name = "Clientes",
+                Title = "Administre os seus clientes",
+                Path = "/client",
+                Icon = "&#xe037"
+            },
+            new Menu
+            {
+                Name = "Administração",
+                Title = "Administre os usuários da aplicação",
+                Path = "/administrador",
                 Icon = "&#xe037"
             },
 
@@ -76,4 +83,3 @@ namespace PetShop.Web.UI.Services
         }
     }
 }
-
